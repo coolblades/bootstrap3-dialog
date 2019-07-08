@@ -1071,6 +1071,9 @@
                 if (dialog.isAutodestroy()) {
                     dialog.setRealized(false);
                     delete BootstrapDialog.dialogs[dialog.getId()];
+                    if (dialog.draggableData.bodyMousemoveEvent) {
+                        $('body').off('mousemove', dialog.draggableData.bodyMousemoveEvent);
+                    }
                     $(this).remove();
                 }
                 BootstrapDialog.moveFocus();
@@ -1122,7 +1125,7 @@
                 this.getModal().on('mouseup mouseleave', {dialog: this}, function (event) {
                     event.data.dialog.draggableData.isMouseDown = false;
                 });
-                $('body').on('mousemove', {dialog: this}, function (event) {
+                this.draggableData.bodyMousemoveEvent = function (event) {
                     var dialog = event.data.dialog;
                     if (!dialog.draggableData.isMouseDown) {
                         return;
@@ -1131,7 +1134,8 @@
                         top: event.clientY - dialog.draggableData.mouseOffset.top,
                         left: event.clientX - dialog.draggableData.mouseOffset.left
                     });
-                });
+                }
+                $('body').on('mousemove', {dialog: this}, this.draggableData.bodyMousemoveEvent);
             }
 
             return this;
