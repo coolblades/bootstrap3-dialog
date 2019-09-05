@@ -7,7 +7,7 @@ Make use of Bootstrap Modal more monkey-friendly.
 
 See live examples here: <a href="http://nakupanda.github.io/bootstrap3-dialog/">http://nakupanda.github.io/bootstrap3-dialog/</a>
 
-Please note that this project is for <a href="http://getbootstrap.com/"><strong>Bootstrap 3</strong></a>.
+Please note that this project is for <a href="https://getbootstrap.com/docs/3.3/"><strong>Bootstrap 3</strong></a> and <a href="https://getbootstrap.com/"><strong>Bootstrap 4</strong></a>.
 
 Thanks for [akinoniku](https://github.com/akinoniku)'s suggestions on dialog appearance.
 
