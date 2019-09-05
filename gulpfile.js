@@ -41,7 +41,9 @@ gulp.task("dist", ["clean", "less"], function() {
   gulp.src(["src/js/bootstrap-dialog.js"])
     .pipe(gulp.dest("dist/js"))
     .pipe(rename("bootstrap-dialog.min.js"))
-    .pipe(uglify())
+    .pipe(uglify().on('error', function(e){
+            console.log(e);
+         }))
     .pipe(gulp.dest("dist/js"))
     .pipe(notify({
       message: "Build task completed."
