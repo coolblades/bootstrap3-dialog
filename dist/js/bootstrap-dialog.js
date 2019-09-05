@@ -40,7 +40,11 @@
      * ================================================ */
     var Modal = $.fn.modal.Constructor;
     var BootstrapDialogModal = function (element, options) {
-        Modal.call(this, element, options);
+        var a = element;
+        if (! a.querySelector) {
+            a = element[0];
+        }
+        Modal.call(this, a, options);
     };
     BootstrapDialogModal.getModalVersion = function () {
         var version = null;
@@ -50,8 +54,10 @@
             version = 'v3.2';
         } else if (/3\.3\.[1,2]/.test($.fn.modal.Constructor.VERSION)) {
             version = 'v3.3';  // v3.3.1, v3.3.2
+        } else if (/3\.3\.[3,4]/.test($.fn.modal.Constructor.VERSION)) {
+            version = 'v3.3.4';  // v3.3.3, v3.3.4
         } else {
-            version = 'v3.3.4';
+            version = 'v4';
         }
 
         return version;
@@ -139,6 +145,24 @@
         }
     };
     BootstrapDialogModal.METHODS_TO_OVERRIDE['v3.3.4'] = $.extend({}, BootstrapDialogModal.METHODS_TO_OVERRIDE['v3.3']);
+    BootstrapDialogModal.METHODS_TO_OVERRIDE['v4'] = {
+        _hideModal: function () {
+            this._element.style.display = 'none';
+            this._element.setAttribute('aria-hidden', true);
+            this._element.removeAttribute('aria-modal');
+            this._isTransitioning = false;
+
+            this._showBackdrop($.proxy(function () {
+                var openedDialogs = this.getGlobalOpenedDialogs();
+                if (openedDialogs.length === 0) {
+                    $(document.body).removeClass('modal-open');
+                }
+                this._resetAdjustments();
+                this._resetScrollbar();
+                $(this._element).trigger('hidden.bs.modal');
+            }, this));
+        }
+    };
     BootstrapDialogModal.prototype = {
         constructor: BootstrapDialogModal,
         /**
@@ -363,6 +387,28 @@
     };
     BootstrapDialog.METHODS_TO_OVERRIDE['v3.3'] = {};
     BootstrapDialog.METHODS_TO_OVERRIDE['v3.3.4'] = $.extend({}, BootstrapDialog.METHODS_TO_OVERRIDE['v3.1']);
+    BootstrapDialog.METHODS_TO_OVERRIDE['v4'] = {
+        handleModalBackdropEvent: BootstrapDialog.METHODS_TO_OVERRIDE['v3.3.4']['handleModalBackdropEvent'],
+        open: BootstrapDialog.METHODS_TO_OVERRIDE['v3.3.4']['open'],
+        updateZIndex: function () {
+            if (this.isOpened()) {
+                var zIndexBackdrop = 1040;
+                var zIndexModal = 1050;
+                var dialogCount = 0;
+                $.each(BootstrapDialog.dialogs, function (dialogId, dialogInstance) {
+                    if (dialogInstance.isRealized() && dialogInstance.isOpened()) {
+                        dialogCount++;
+                    }
+                });
+                var $modal = this.getModal();
+                var $backdrop = $($modal.data('bs.modal')._backdrop);
+                $modal.css('z-index', zIndexModal + (dialogCount - 1) * 20);
+                $backdrop.css('z-index', zIndexBackdrop + (dialogCount - 1) * 20);
+            }
+
+            return this;
+        }
+    };
     BootstrapDialog.prototype = {
         constructor: BootstrapDialog,
         initOptions: function (options) {
