@@ -93,12 +93,12 @@
 
             this.$element
             .removeClass('in')
-            .attr('aria-hidden', true)
+            .attr('aria-hidden', false)
             .off('click.dismiss.bs.modal');
 
             $.support.transition && this.$element.hasClass('fade') ?
             this.$element
-            .one('bsTransitionEnd', $.proxy(this.hideModal, this))
+            .one('bsTransitionEnd', this.hideModal.bind(this))
             .emulateTransitionEnd(300) :
             this.hideModal();
         }
@@ -133,7 +133,7 @@
          */
         hideModal: function () {
             this.$element.hide();
-            this.backdrop($.proxy(function () {
+            this.backdrop(function () {
                 var openedDialogs = this.getGlobalOpenedDialogs();
                 if (openedDialogs.length === 0) {
                     this.$body.removeClass('modal-open');
@@ -141,7 +141,7 @@
                 this.resetAdjustments();
                 this.resetScrollbar();
                 this.$element.trigger('hidden.bs.modal');
-            }, this));
+            }.bind(this));
         }
     };
     BootstrapDialogModal.METHODS_TO_OVERRIDE['v3.3.4'] = $.extend({}, BootstrapDialogModal.METHODS_TO_OVERRIDE['v3.3']);
@@ -152,7 +152,7 @@
             this._element.removeAttribute('aria-modal');
             this._isTransitioning = false;
 
-            this._showBackdrop($.proxy(function () {
+            this._showBackdrop(function () {
                 var openedDialogs = this.getGlobalOpenedDialogs();
                 if (openedDialogs.length === 0) {
                     $(document.body).removeClass('modal-open');
@@ -160,7 +160,7 @@
                 this._resetAdjustments();
                 this._resetScrollbar();
                 $(this._element).trigger('hidden.bs.modal');
-            }, this));
+            }.bind(this));
         }
     };
     BootstrapDialogModal.prototype = {
@@ -336,7 +336,7 @@
             }
         });
         if (lastDialogInstance !== null) {
-            lastDialogInstance.getModal().focus();
+            lastDialogInstance.getModal().trigger('focus');
         }
     };
 
@@ -439,7 +439,7 @@
             return this;
         },
         createModal: function () {
-            var $modal = $('<div class="modal" role="dialog" aria-hidden="true"></div>');
+            var $modal = $('<div class="modal" role="dialog" aria-hidden="false"></div>');
             $modal.prop('id', this.getId());
             $modal.attr('aria-labelledby', this.getId() + '_title');
 
@@ -874,7 +874,7 @@
             $button.data('button', button);
 
             // Icon
-            if (typeof button.icon !== 'undefined' && $.trim(button.icon) !== '') {
+            if (typeof button.icon !== 'undefined' && button.icon.trim() !== '') {
                 $button.append(this.createButtonIcon(button.icon));
             }
 
@@ -889,7 +889,7 @@
             }
 
             // Css class
-            if (typeof button.cssClass !== 'undefined' && $.trim(button.cssClass) !== '') {
+            if (typeof button.cssClass !== 'undefined' && button.cssClass.trim() !== '') {
                 $button.addClass(button.cssClass);
             } else {
                 $button.addClass('btn-default');
@@ -1141,7 +1141,7 @@
                 var dialog = event.data.dialog;
                 if (typeof dialog.registeredButtonHotkeys[event.which] !== 'undefined') {
                     var $button = $(dialog.registeredButtonHotkeys[event.which]);
-                    !$button.prop('disabled') && !$button.is(':focus') && $button.focus().trigger('click');
+                    !$button.prop('disabled') && !$button.is(':focus') && $button.trigger('focus').trigger('click');
                 }
             });
 
